@@ -16,8 +16,15 @@ Note::Note(){
   title=quote=summary=importance="whom knows";
   tags={};
   //does tags start off initialized and okay???
-  x=y=0;
+  x=y=10;
   src=*(new Source("person"));
+}
+
+Note::Note(Source s){
+  title=quote=summary=importance="";
+  tags={};
+  x=y=10;
+  src=s;
 }
 
 Note::Note(string t,Source s,string quo,string sum,string imp,vector<string> ta){
@@ -32,7 +39,7 @@ Note::Note(string t,Source s,string quo,string sum,string imp,vector<string> ta)
 
 Note::Note(const Note& other){
   title=other.title;
-  src=other.src;//TODO: Source::operator=
+  src=other.src;
   quote=other.quote;
   summary=other.summary;
   importance=other.importance;
@@ -62,12 +69,7 @@ void Note::draw(){
   glEnd();
 
   glColor3f(0,0,0);
-  drawText(title,x,y+18,2);//just have the title
-  //drawText(quote,x+5,y+25,0);
-  /* size 18 is 14px under the top...
-     sizes 12 is 9px under
-     size 10 is 8px under
-   */
+  drawText(title,x,y+18,2);
   
   glBegin(GL_LINE_LOOP);
   glVertex2f(x,y);

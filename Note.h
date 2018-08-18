@@ -13,8 +13,8 @@ using namespace std;
 
 class Note{
  public:
-  const int H=60;
-  const int W=100;
+  static const int H=60;
+  static const int W=100;
   string title;
   Source src;
   string quote;
@@ -24,6 +24,7 @@ class Note{
   int x,y;
 
   Note();
+  Note(Source s);
   Note(string t,Source s,string quo,string sum,string imp,vector<string> tags);
   Note(const Note& other);
 

@@ -8,10 +8,10 @@ else
 endif
 
 
-nerdNotes:	Note.o Source.o main.o
-	g++ $(OPTS) -o nerdNotes Note.o Source.o main.o $(LIBS)
+nerdNotes:	Note.o Source.o Button.o Textbox.o main.o
+	g++ $(OPTS) -o nerdNotes Note.o Source.o Button.o Textbox.o main.o $(LIBS)
 
-main.o:	main.cpp Note.h Source.h glutFuncs.h
+main.o:	main.cpp Note.h Source.h glutFuncs.h Button.h Textbox.h
 	g++ $(OPTS) $(MACOSX_DEFINE) -c main.cpp
 
 Note.o:	Note.h Note.cpp Source.h glutFuncs.h
@@ -19,6 +19,12 @@ Note.o:	Note.h Note.cpp Source.h glutFuncs.h
 
 Source.o:	Source.h Source.cpp Note.h
 	g++ $(OPTS) -c Source.cpp
+
+Button.o:	Button.h Button.cpp Note.h
+	g++ $(OPTS) -c Button.cpp
+
+Textbox.o:	Textbox.h Textbox.cpp
+	g++ $(OPTS) -c Textbox.cpp
 
 
 clean:
