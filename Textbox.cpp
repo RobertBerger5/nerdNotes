@@ -7,7 +7,6 @@
 #include <iostream>
 
 #include "Textbox.h"
-//#include "Note.h"
 #include "glutFuncs.h"
 
 using namespace std;
@@ -60,7 +59,10 @@ void Textbox::draw(){
   glVertex2f(x+w-thicc*2,y+h-thicc*2);
   glVertex2f(x+thicc,y+h-thicc*2);
   glEnd();
-
+  
+  int cX;//cursor x and y
+  int cY;
+  
   glColor3f(.5,.5,.5);
   glBegin(GL_POLYGON);
   glVertex2f(0,0);//TODO: DRAW CURSOR SOMEHOW!!!
@@ -80,4 +82,9 @@ bool Textbox::inside(int x1,int y1){
      y1>y &&
      y1<y+h
 	 );
+}
+
+bool Textbox::findCursor(int x1,int y1){
+
+  return false;//if all else has failed...
 }

@@ -105,7 +105,7 @@ void reshape(int w,int h){
 }
 
 void keyboard(unsigned char c,int x,int y){
-  //cout<<c<<endl;
+  cout<<c<<endl;
   if(c==27){
     cout<<"exiting..."<<endl;
     glutDestroyWindow(glutGetWindow());
@@ -138,6 +138,8 @@ void keyboardSpecial(int key, int x, int y){
     switch(key){
     case GLUT_KEY_LEFT:
       editT->cursorI--;
+    case GLUT_KEY_RIGHT:
+      editT->cursorI++;
     default:
       break;
     }
@@ -184,6 +186,7 @@ void mouse(int button, int state, int x, int y){
 	  if(etI->inside(x,y)){
 	    etI->selected=true;
 	    editT=&(*etI);
+	    etI->findCursor(x,y);
 	  }
 	}
       }
