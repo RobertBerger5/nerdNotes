@@ -3,8 +3,6 @@
 
 #include <string.h>
 
-using namespace std;
-
 //TODO: not gonna bother with MLA/Chicago shittery probably, just (author),"(title)"...
 class Source{
  public:

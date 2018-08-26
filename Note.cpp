@@ -69,7 +69,7 @@ void Note::draw(){
   glEnd();
 
   glColor3f(0,0,0);
-  drawText(title,x,y+18,2);
+  drawText(title,x,y,true,W);
   
   glBegin(GL_LINE_LOOP);
   glVertex2f(x,y);

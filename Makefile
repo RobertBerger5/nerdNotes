@@ -20,10 +20,10 @@ Note.o:	Note.h Note.cpp Source.h glutFuncs.h
 Source.o:	Source.h Source.cpp Note.h
 	g++ $(OPTS) -c Source.cpp
 
-Button.o:	Button.h Button.cpp Note.h
+Button.o:	Button.h Button.cpp Note.h glutFuncs.h
 	g++ $(OPTS) -c Button.cpp
 
-Textbox.o:	Textbox.h Textbox.cpp
+Textbox.o:	Textbox.h Textbox.cpp glutFuncs.h
 	g++ $(OPTS) -c Textbox.cpp
 
 

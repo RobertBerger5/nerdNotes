@@ -13,6 +13,7 @@
 using namespace std;
 
 Textbox::Textbox(){
+  label="?: ";
   text="";
   x=y=0;
   w=100;
@@ -20,7 +21,8 @@ Textbox::Textbox(){
   selected=false;
 }
 
-Textbox::Textbox(string t,int x1,int y1,int w1,int h1){
+Textbox::Textbox(string l,string t,int x1,int y1,int w1,int h1){
+  label=l+": ";
   text=t;
   x=x1;
   y=y1;
@@ -30,11 +32,12 @@ Textbox::Textbox(string t,int x1,int y1,int w1,int h1){
 }
 
 void Textbox::addLetter(char c){
-  cout<<"somehow add "<<c<<endl;
+  text+=c;
 }
 
 void Textbox::backspace(){
-  cout<<"bakkbakk man"<<endl;
+  if(text.size()>0)
+    text.erase(text.end()-1);
 }
 
 void Textbox::draw(){
@@ -58,8 +61,14 @@ void Textbox::draw(){
   glVertex2f(x+thicc,y+h-thicc*2);
   glEnd();
 
+  glColor3f(.5,.5,.5);
+  glBegin(GL_POLYGON);
+  glVertex2f(0,0);//TODO: DRAW CURSOR SOMEHOW!!!
+  glEnd();
+
   glColor3f(0,0,0);
-  drawText(text,x,y+18,0);
+  drawText(text,x,y,false,w);
+  drawText(label,x-8*label.size(),y,false);
   
   glutPostRedisplay();
 }

@@ -20,7 +20,7 @@ Button::Button(){
   //TODO: func
 }
 
-Button::Button(string l,int x1, int y1, int w1,int h1,void (*f)(Note n)){
+Button::Button(string l,int x1, int y1, int w1,int h1,void (*f)(Note& n)){
   label=l;
   x=x1;
   y=y1;
@@ -39,8 +39,8 @@ void Button::draw(){
   glEnd();
 
   glColor3f(0,0,0);
-  drawText(label,x,y+18,0);//just have the title
-  //drawText(quote,x+5,y+25,0);
+  drawText(label,x,y,false,w);//just have the title
+  //drawText(quote,x+5,y+25,false);
   /* size 18 is 14px under the top...
      sizes 12 is 9px under
      size 10 is 8px under

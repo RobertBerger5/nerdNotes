@@ -7,32 +7,30 @@
 #include "Source.h"
 
 
-class Source;
-
-using namespace std;
+//class Source;
 
 class Note{
  public:
   static const int H=60;
   static const int W=100;
-  string title;
+  std::string title;
   Source src;
-  string quote;
-  string summary;
-  string importance;
-  vector<string> tags;
+  std::string quote;
+  std::string summary;
+  std::string importance;
+  std::vector<std::string> tags;
   int x,y;
 
   Note();
   Note(Source s);
-  Note(string t,Source s,string quo,string sum,string imp,vector<string> tags);
+  Note(std::string t,Source s,std::string quo,std::string sum,std::string imp,std::vector<std::string> tags);
   Note(const Note& other);
 
   void printNote();
   void draw();
 
-  void addTag(string str);
-  void removeTag(string str);
+  void addTag(std::string str);
+  void removeTag(std::string str);
 };
 
 #endif
