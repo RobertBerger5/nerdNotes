@@ -305,6 +305,10 @@ void drawWindow(){
 void editNote(Note& n){
   editing=true;
   editN=&n;
+  editTexts[0].text=editN->title;
+  editTexts[1].text=editN->quote;
+  editTexts[2].text=editN->summary;
+  editTexts[3].text=editN->importance;
   cout<<"editing "<<n.title<<"..."<<endl;
 }
 
@@ -345,14 +349,16 @@ int main(int argc,char*argv[]){
   int linesize=20;//height of a line
   int lines=1;
   int xstart=100;//how far over they start
-  editTexts.push_back(Textbox("Title","Title of the rigs",xstart,10,twidth,linesize));//takes up one line
+  editTexts.push_back(Textbox("Title","these should all be overwritten...",xstart,10,twidth,linesize));//takes up one line
   lines+=2;
-  editTexts.push_back(Textbox("Quote","legend has it that aaaaaaaa.",xstart,linesize*(lines),twidth,linesize*10));
-  lines+=11;
-  editTexts.push_back(Textbox("Summary","theres a legend aaaa",xstart,linesize*(lines),twidth,linesize*5));
+  editTexts.push_back(Textbox("Quote","?",xstart,linesize*(lines),twidth,linesize*5));
   lines+=6;
-  editTexts.push_back(Textbox("So what?","important cuz aaa and aa gooda;slkdgjwd;flkvbnrwe;lknvdfl;kfjsdflgkjsfgkjhdflhkjhcvlkmdnl;vkdfjglaskjdcvb;sldfsj;aldskfjga;dlkjvs;dfjghkad;flskgjwe;odlvjslvmbnalskxjw;lfkgj;alsdkfjg;fadkljvbfkdlsjasv",xstart,linesize*(lines),twidth,linesize*3));
+  editTexts.push_back(Textbox("Summary","??",xstart,linesize*(lines),twidth,linesize*5));
+  lines+=6;
+  editTexts.push_back(Textbox("So what?","???",xstart,linesize*(lines),twidth,linesize*3));
   lines+=4;
+
+  editButtons.push_back(Button("Save Note",50,HEIGHT-100,100,50,saveNote));
   
   init_gl_window();
 }
