@@ -105,7 +105,6 @@ void reshape(int w,int h){
 }
 
 void keyboard(unsigned char c,int x,int y){
-  cout<<c<<endl;
   if(c==27){
     cout<<"exiting..."<<endl;
     glutDestroyWindow(glutGetWindow());
@@ -114,36 +113,47 @@ void keyboard(unsigned char c,int x,int y){
   
   if(!editing){//just ignore individual buttons while editing
     switch(c){
-    /*case 'q':
-    case 'Q':
-      cout<<"exiting..."<<endl;
-      //TODO: is this safe???
-      glutDestroyWindow(glutGetWindow());
-      exit(0);
-      break;*/
     default:
       break;
     }
   }else{
-    if(c!='\\')
+    switch(c){
+    case 127:
+      if(editT->cursorI>0)
+	editT->backspace();
+      break;
+    default:
+      editT->addLetter(c);
+      break;
+    }
+    /*if(c==127)
+      editT->backspace();
+    else if(c!='\\')//this shit is backspace cuz the delete button is hiding from me
       editT->addLetter(c);
     else
-      editT->backspace();
+    editT->backspace();*/
   }
   glutPostRedisplay();
 }
 
 void keyboardSpecial(int key, int x, int y){
-  if(editing){
+  /*if(editing && editT){//now nothing here works without a Textbox being sleected
     switch(key){
-    case GLUT_KEY_LEFT:
-      editT->cursorI--;
+      case GLUT_KEY_LEFT:
+      if((editT->cursorI)>0)
+	editT->cursorI=editT->cursorI-1;
+      else
+	cerr<<"no left"<<endl;
     case GLUT_KEY_RIGHT:
-      editT->cursorI++;
+      if(editT->cursorI < editT->text.size()-1)
+	editT->cursorI++;
+      else
+	cerr<<"no right"<<endl;
     default:
       break;
     }
-  }
+    cout<<editT->cursorI<<endl;
+    }*/
 }
 
 void mouse(int button, int state, int x, int y){
@@ -184,6 +194,8 @@ void mouse(int button, int state, int x, int y){
 	
 	for(etI=editTexts.begin();etI!=editTexts.end();etI++){
 	  if(etI->inside(x,y)){
+	    if(editT)
+	      editT->selected=false;
 	    etI->selected=true;
 	    editT=&(*etI);
 	    etI->findCursor(x,y);
@@ -339,10 +351,8 @@ int main(int argc,char*argv[]){
   lines+=11;
   editTexts.push_back(Textbox("Summary","theres a legend aaaa",xstart,linesize*(lines),twidth,linesize*5));
   lines+=6;
-  editTexts.push_back(Textbox("So what?","important cuz aaa and aa good",xstart,linesize*(lines),twidth,linesize*3));
+  editTexts.push_back(Textbox("So what?","important cuz aaa and aa gooda;slkdgjwd;flkvbnrwe;lknvdfl;kfjsdflgkjsfgkjhdflhkjhcvlkmdnl;vkdfjglaskjdcvb;sldfsj;aldskfjga;dlkjvs;dfjghkad;flskgjwe;odlvjslvmbnalskxjw;lfkgj;alsdkfjg;fadkljvbfkdlsjasv",xstart,linesize*(lines),twidth,linesize*3));
   lines+=4;
-  
-  editButtons.push_back(Button("Save Note",50,HEIGHT-100,100,50,saveNote));
   
   init_gl_window();
 }

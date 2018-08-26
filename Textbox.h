@@ -5,6 +5,8 @@
 
 class Textbox{
  public:
+  const int LETTER_W=8;
+  const int LETTER_H=13;
   std::string label;
   std::string text;
   int x,y,w,h;
@@ -21,7 +23,7 @@ class Textbox{
   void draw();
   
   bool inside(int x1,int y1);
-  bool findCursor(int x1,int y1);//finds where they clicked, true if found
+  void findCursor(int x1,int y1);//finds where they clicked, true if found
 };
 
 #endif

@@ -28,15 +28,19 @@ Textbox::Textbox(string l,string t,int x1,int y1,int w1,int h1){
   w=w1;
   h=h1;
   selected=false;
+  cursorI=text.size();
 }
 
 void Textbox::addLetter(char c){
-  text+=c;
+  //text+=c;
+  text.insert(cursorI,1,c);
+  cursorI++;
 }
 
 void Textbox::backspace(){
   if(text.size()>0)
-    text.erase(text.end()-1);
+    text.erase(cursorI-1,1);
+  cursorI--;
 }
 
 void Textbox::draw(){
@@ -60,14 +64,20 @@ void Textbox::draw(){
   glVertex2f(x+thicc,y+h-thicc*2);
   glEnd();
   
-  int cX;//cursor x and y
-  int cY;
+  //draw cursor
+  if(selected){
+    int letPerLine=w/LETTER_W;
+    int cX=cursorI%letPerLine*LETTER_W +x;//cursor x and y
+    int cY=cursorI/letPerLine*LETTER_H +y;
+    glColor3f(.5,.5,.5);
+    glBegin(GL_POLYGON);
+    glVertex2f(cX,cY);
+    glVertex2f(cX+LETTER_W,cY);
+    glVertex2f(cX+LETTER_W,cY+LETTER_H);
+    glVertex2f(cX,cY+LETTER_H);
+    glEnd();
+  }
   
-  glColor3f(.5,.5,.5);
-  glBegin(GL_POLYGON);
-  glVertex2f(0,0);//TODO: DRAW CURSOR SOMEHOW!!!
-  glEnd();
-
   glColor3f(0,0,0);
   drawText(text,x,y,false,w);
   drawText(label,x-8*label.size(),y,false);
@@ -84,7 +94,14 @@ bool Textbox::inside(int x1,int y1){
 	 );
 }
 
-bool Textbox::findCursor(int x1,int y1){
-
-  return false;//if all else has failed...
+void Textbox::findCursor(int x1,int y1){
+  int letPerLine=w/LETTER_W;
+  
+  //step 1: find the general range of numbers it can be in with the y coord
+  //step 2: use mod or somethin to get which one from the x coord
+  cursorI=((y1-y)/LETTER_H)*letPerLine;
+  cursorI+=(x1-x)/LETTER_W;
+  
+  if(cursorI>text.size())
+    cursorI=text.size();
 }
