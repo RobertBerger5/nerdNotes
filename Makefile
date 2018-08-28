@@ -14,7 +14,7 @@ nerdNotes:	Note.o Source.o Button.o Textbox.o main.o
 main.o:	main.cpp Note.h Source.h glutFuncs.h Button.h Textbox.h
 	g++ $(OPTS) $(MACOSX_DEFINE) -c main.cpp
 
-Note.o:	Note.h Note.cpp Source.h glutFuncs.h
+Note.o:	Note.h Note.cpp Source.h Button.h glutFuncs.h
 	g++ $(OPTS) -c Note.cpp
 
 Source.o:	Source.h Source.cpp Note.h

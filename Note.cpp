@@ -50,6 +50,15 @@ Note::Note(const Note& other){
   }
 }
 
+bool Note::inside(int x1,int y1){
+  return(
+	 x1>x &&
+	 x1<x+W &&
+	 y1>y &&
+	 y1<y+H
+  );
+}
+
 void Note::printNote(){
   cout<<title<<endl;
   src.printSource();

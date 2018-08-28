@@ -5,6 +5,7 @@
 
 #include "Note.h"
 
+class Note;
 
 class Button{
  public:

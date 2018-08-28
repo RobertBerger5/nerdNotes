@@ -57,6 +57,8 @@ void mouse(int button,int state,int x,int y);
 void mouseMotion(int x,int y);
 void mouseMotionPassive(int x,int y);
 
+void editNote(Note& n);
+
 void init(void){
   glClearColor(50,50,50,1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -166,12 +168,13 @@ void mouse(int button, int state, int x, int y){
       //logic for notes first?
       if(!editing){
 	for(rnI=notes.rbegin();rnI!=notes.rend();++rnI){
-	  if(
+	  /*if(//TODO: change to just call inside()...
 	     x>rnI->x &&
 	     x<rnI->x+rnI->W &&
 	     y>rnI->y &&
 	     y<rnI->y+rnI->H
-	     ){
+	     ){*/
+	  if(rnI->inside(x,y)){
 	    dragN=&(*rnI);//wow this looks reduntant, yay for iterators
 	    dragX=rnI->x-x;//offset, where the mouse was...
 	    dragY=rnI->y-y;//relative to the card when clicked
@@ -204,9 +207,16 @@ void mouse(int button, int state, int x, int y){
       }
     }else{
       //left released
-      //mouseDragging=false;
-      dragN=0;
-      dragX=dragY=0;
+      //cycle through, if there's a note clicked and the mouse hasn't moved, then yippee
+      if(!editing){
+	for(nI=notes.begin();nI!=notes.end();++nI){
+	  if((xStart==xPtr && yStart==yPtr) && nI->inside(x,y)){
+	    editNote(*nI);
+	  }
+	}
+	dragN=0;
+	dragX=dragY=0;
+      }
     }
   }else{
     if(GLUT_DOWN==state){
@@ -309,6 +319,12 @@ void editNote(Note& n){
   editTexts[1].text=editN->quote;
   editTexts[2].text=editN->summary;
   editTexts[3].text=editN->importance;
+  //TODO: should probably just havec one of these selected at a time
+  //like a Textbox* selected or somethin
+  for(etI=editTexts.begin();etI!=editTexts.end();etI++){
+    if(etI->selected)
+      etI->selected=false;
+  }
   cout<<"editing "<<n.title<<"..."<<endl;
 }
 
@@ -316,7 +332,7 @@ void newNote(Note& n){
   //terrible practice, but imma just not do
   //anything with Note n, lmao rip
   notes.push_back(Note(sources[0]));//push an empty rig
-  editNote(notes[notes.end()]);//edit the last one (that we just pushed in)
+  editNote(notes[notes.size()-1]);//edit the last one (that we just pushed in)
 }
 
 void saveNote(Note& n){
@@ -358,3 +374,19 @@ int main(int argc,char*argv[]){
   
   init_gl_window();
 }
+
+/*
+okay new plan
+make the whole viewer rig pop up when they release the mouse
+BUT only if their start click coord == end click coord!
+so like they just click on the rig
+then inside the viewer, there can just be a section where, if clicked,
+editNote() is called on whichever note has been clicked!
+
+but how should I go about this viewing screen? part of Note class???
+
+
+TODO:
+  move the cursor to the last part of the selected textbox when clicked
+  
+ */
