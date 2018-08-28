@@ -95,7 +95,7 @@ void init_gl_window(){
   glutMainLoop();
 }
 
-void reshape(int w,int h){
+void reshape(int w,int h){//TODO: NOTHING MOVES RIGHT NOW
   glViewport(0,0,(GLsizei)w,(GLsizei)h);
   WIDTH=w;
   HEIGHT=h;
@@ -316,7 +316,7 @@ void newNote(Note& n){
   //terrible practice, but imma just not do
   //anything with Note n, lmao rip
   notes.push_back(Note(sources[0]));//push an empty rig
-  editNote(notes[notes.size()-1]);//edit the last one (that we just pushed in)
+  editNote(notes[notes.end()]);//edit the last one (that we just pushed in)
 }
 
 void saveNote(Note& n){
@@ -336,13 +336,7 @@ int main(int argc,char*argv[]){
   sources.push_back(Source("(please select a note...)"));//default source (kinda)
   //should probably just have a check if notes.size()>0, if not then just complain
   
-  for(int i=0;i<0;i++){
-    notes.push_back(Note("titlerig",sources[0],"quoterig","sumrig","imprig",{"tag","rig","please work"}));
-  }
-  
   buttons.push_back(Button("New Note",50,HEIGHT-100,100,50,newNote));
-  //buttons.push_back(Button("toggle edit",50,50,50,30,toggleEdit)); doesn't work anyway, can't click buttons while editing lol dumbo
-  
   
   //editTexts.push_back(Textbox("label","text here",50,150,100,30));
   int twidth=700;
@@ -357,8 +351,10 @@ int main(int argc,char*argv[]){
   lines+=6;
   editTexts.push_back(Textbox("So what?","???",xstart,linesize*(lines),twidth,linesize*3));
   lines+=4;
-
+  
+  
   editButtons.push_back(Button("Save Note",50,HEIGHT-100,100,50,saveNote));
+  
   
   init_gl_window();
 }

@@ -6,9 +6,6 @@
 
 #include "Source.h"
 
-
-//class Source;
-
 class Note{
  public:
   static const int H=60;
