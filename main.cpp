@@ -22,7 +22,7 @@ using namespace std;
 int WIDTH=1000;
 int HEIGHT=600;
 char progName[]="nerdNotes";
-string fileDir,saveDir;//file locations to save and open nerdNotes files
+string fileDir;//file locations to save and open nerdNotes files
 //bool mouseDragging=false;pretty sure this is useless now
 int xStart,yStart,xPtr,yPtr;//where the mouse clicked down last and where it is now
 Note* dragN=0;//the note that is being dragged
@@ -37,11 +37,15 @@ vector<Note> notes={};
 vector<Source> sources={};
 vector<Button> buttons={};
 vector<Textbox> texts={};
+vector<string> allTags={};
+
+vector<string>::iterator tagI;
+
 vector<Note>::iterator nI;
 vector<Note>::reverse_iterator rnI;
 vector<Source>::iterator sI;
 vector<Button>::iterator bI;
-vector<Textbox>::iterator tI;
+//vector<Textbox>::iterator t;
 
 vector<Button> editButtons={};
 vector<Textbox> editTexts={};
@@ -58,6 +62,7 @@ void mouseMotion(int x,int y);
 void mouseMotionPassive(int x,int y);
 
 void editNote(Note& n);
+void saveFile(Note& n);
 
 void init(void){
   glClearColor(50,50,50,1);
@@ -74,7 +79,7 @@ void init(void){
 }
 
 void init_gl_window(){
-  //TODO: wtf are these even...
+  //TODO: what are these even...
   char*argv[]={progName};
   int argc=sizeof(argv)/sizeof(argv[0]);
   
@@ -109,6 +114,8 @@ void reshape(int w,int h){//TODO: NOTHING MOVES RIGHT NOW
 void keyboard(unsigned char c,int x,int y){
   if(c==27){
     cout<<"exiting..."<<endl;
+    //TODO: PROMPT TO SAVE FIRST?
+    //saveFile(*(new Note()));
     glutDestroyWindow(glutGetWindow());
     exit(0);
   }
@@ -168,12 +175,6 @@ void mouse(int button, int state, int x, int y){
       //logic for notes first?
       if(!editing){
 	for(rnI=notes.rbegin();rnI!=notes.rend();++rnI){
-	  /*if(//TODO: change to just call inside()...
-	     x>rnI->x &&
-	     x<rnI->x+rnI->W &&
-	     y>rnI->y &&
-	     y<rnI->y+rnI->H
-	     ){*/
 	  if(rnI->inside(x,y)){
 	    dragN=&(*rnI);//wow this looks reduntant, yay for iterators
 	    dragX=rnI->x-x;//offset, where the mouse was...
@@ -182,20 +183,20 @@ void mouse(int button, int state, int x, int y){
 	  }
 	}
 	
-	for(bI=buttons.begin();bI!=buttons.end();bI++){
+	for(bI=buttons.begin();bI!=buttons.end();++bI){
 	  if(bI->inside(x,y)){
 	    bI->func(notes[0]);
 	  }
 	}
       }else{
 	//tryna click while editing
-	for(ebI=editButtons.begin();ebI!=editButtons.end();ebI++){
+	for(ebI=editButtons.begin();ebI!=editButtons.end();++ebI){
 	  if(ebI->inside(x,y)){
 	    ebI->func(notes[0]);
 	  }
 	}
 	
-	for(etI=editTexts.begin();etI!=editTexts.end();etI++){
+	for(etI=editTexts.begin();etI!=editTexts.end();++etI){
 	  if(etI->inside(x,y)){
 	    if(editT)
 	      editT->selected=false;
@@ -273,14 +274,14 @@ void drawWindow(){
 
     
     //don't even have any non-editing textboxes now...
-    for(tI=texts.begin();tI!=texts.end();tI++){
+    /*for(tI=texts.begin();tI!=texts.end();++tI){
       if(tI->selected){
 	glColor3f(1,0,0);
       }else{
 	glColor3f(0,0,0);
       }
       tI->draw();
-    }
+      }*/
     
     //always draw the notes last I think...
     for(nI=notes.begin();nI!=notes.end();++nI){
@@ -288,8 +289,7 @@ void drawWindow(){
     }
     
   }else{
-    //TODO: EDITING MENU
-    for(etI=editTexts.begin();etI!=editTexts.end();etI++){
+    for(etI=editTexts.begin();etI!=editTexts.end();++etI){
       if(etI->selected){
 	glColor3f(1,0,0);
       }else{
@@ -319,11 +319,15 @@ void editNote(Note& n){
   editTexts[1].text=editN->quote;
   editTexts[2].text=editN->summary;
   editTexts[3].text=editN->importance;
-  //TODO: should probably just havec one of these selected at a time
+  //TODO: GET TAGS IN THERE
+  for(tagI=editN->tags.begin(); tagI!=(editN->tags.end()-1); ++tagI){
+    editTexts[4].text+= *tagI +", ";
+  }
+  editTexts[4].text+= *(editN->tags.end()-1);
+  //TODO: should probably just have one of these selected at a time
   //like a Textbox* selected or somethin
-  for(etI=editTexts.begin();etI!=editTexts.end();etI++){
-    if(etI->selected)
-      etI->selected=false;
+  for(etI=editTexts.begin();etI!=editTexts.end();++etI){
+    etI->selected=false;
   }
   cout<<"editing "<<n.title<<"..."<<endl;
 }
@@ -336,12 +340,41 @@ void newNote(Note& n){
 }
 
 void saveNote(Note& n){
-  //TODO: take everything from editTexts and shove it into n
   editN->title=editTexts[0].text;
   editN->quote=editTexts[1].text;
   editN->summary=editTexts[2].text;
   editN->importance=editTexts[3].text;
+  
+  
+  //internet people are saying to use boost's algorithm for splitting, but imma do it my own slow way
+  editN->tags={};//clear em out
+  string tagString=editTexts[4].text;
+  string newTag="";//individual tag to get pushed a ton
+  for(int i=0;i<tagString.size();i++){
+    if(tagString[i]!=','){//not a comma, so add it to the current tag
+      newTag+=tagString[i];
+    }else{
+      editN->tags.push_back(newTag);//found comma, so push what we have into a tag
+      newTag="";//clear it for the next tag
+      i++;//skip space
+    }
+  }
+  //push whatever's left over in tagString
+  editN->tags.push_back(newTag);
+  
+  
   editing=false;
+  for(etI=editTexts.begin();etI!=editTexts.end();++etI){
+    etI->text="";//clear em out (just to be sure)
+  }
+}
+
+void saveFile(Note& n){//kinda annoying that I set it up for all button-able funcs to have this arg
+  cout<<"I should really find out how to save this to a file"<<endl;
+}
+
+void openFile(string l){//this one ain't gonna be in a button...I think...
+  cout<<"open "<<l<<" and somehow shove its contents into notes and tags..."<<endl;
 }
 
 int main(int argc,char*argv[]){
@@ -349,16 +382,26 @@ int main(int argc,char*argv[]){
     cout<<argv[i]<<endl;
   }
   
+  //TODO: complain that they won't be able to save if they don't open a file from the command line...
+  if(argc==2){
+    fileDir=argv[1];
+    openFile(fileDir);
+  }else{
+    cout<<"ERROR: Please enter exactly one file in the command line"<<endl;
+    cout<<"Enter it directly after \"./nerdNotes,\" thank you."<<endl;
+  }
+  
   sources.push_back(Source("(please select a note...)"));//default source (kinda)
   //should probably just have a check if notes.size()>0, if not then just complain
   
-  buttons.push_back(Button("New Note",50,HEIGHT-100,100,50,newNote));
+  buttons.push_back(Button("New Note",10,HEIGHT-60,100,50,newNote));
+  buttons.push_back(Button("Save File",10,HEIGHT-120,100,50,saveFile));
   
   //editTexts.push_back(Textbox("label","text here",50,150,100,30));
-  int twidth=700;
   int linesize=20;//height of a line
   int lines=1;
   int xstart=100;//how far over they start
+  int twidth=WIDTH-xstart-10;
   editTexts.push_back(Textbox("Title","these should all be overwritten...",xstart,10,twidth,linesize));//takes up one line
   lines+=2;
   editTexts.push_back(Textbox("Quote","?",xstart,linesize*(lines),twidth,linesize*5));
@@ -367,26 +410,24 @@ int main(int argc,char*argv[]){
   lines+=6;
   editTexts.push_back(Textbox("So what?","???",xstart,linesize*(lines),twidth,linesize*3));
   lines+=4;
+  editTexts.push_back(Textbox("Tags","",xstart,linesize*(lines),twidth,linesize));
   
   
-  editButtons.push_back(Button("Save Note",50,HEIGHT-100,100,50,saveNote));
+  editButtons.push_back(Button("Save Note",10,HEIGHT-60,100,50,saveNote));
   
   
   init_gl_window();
 }
 
 /*
-okay new plan
-make the whole viewer rig pop up when they release the mouse
-BUT only if their start click coord == end click coord!
-so like they just click on the rig
-then inside the viewer, there can just be a section where, if clicked,
-editNote() is called on whichever note has been clicked!
-
-but how should I go about this viewing screen? part of Note class???
-
-
-TODO:
-  move the cursor to the last part of the selected textbox when clicked
+big ol TODO list:
   
+  save to file
+  open from file
+  
+  make/edit tags
+  make/edit Sources
+  
+  figure out how to give Notes a source (dropdown kinda thing?)
+  search Notes by tag, highlight ones with that tag...
  */

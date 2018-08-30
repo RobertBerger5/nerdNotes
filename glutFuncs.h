@@ -26,7 +26,8 @@ static void drawText(std::string str,int x,int y,bool big,int w=0){
   
   glRasterPos2i(x+2,y);
 
-  //TODO: it'd be nice if it broke up lines between words
+  //it'd be nice if it broke up lines between words
+  //nevermind, I have NO idea how that'd work with the clicking shit now...
   int over=0;
   int lines=0;
   for(int i=0;i<str.length();i++){

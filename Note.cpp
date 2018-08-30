@@ -22,7 +22,7 @@ Note::Note(){
 
 Note::Note(Source s){
   title=quote=summary=importance="";
-  tags={};
+  tags={""};
   x=y=10;
   src=s;
 }
@@ -34,7 +34,7 @@ Note::Note(string t,Source s,string quo,string sum,string imp,vector<string> ta)
   summary=sum;
   importance=imp;
   tags=ta;//TODO: IS THIS OKAY WITH VECTORS???
-  x=y=10;//spawn in the top left?
+  x=y=10;//spawn in the top left
 }
 
 Note::Note(const Note& other){
@@ -45,9 +45,7 @@ Note::Note(const Note& other){
   importance=other.importance;
   x=other.x;
   y=other.y;
-  for(int i=0;i<tags.size();i++){
-    tags[i]=other.tags[i];
-  }
+  tags=other.tags;
 }
 
 bool Note::inside(int x1,int y1){

@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Source.h"
-#include "Button.h"
 
 
 class Note{
@@ -19,7 +18,6 @@ class Note{
   std::string importance;
   std::vector<std::string> tags;
   int x,y;
-  //Button editB;
 
   Note();
   Note(Source s);
@@ -32,6 +30,14 @@ class Note{
 
   void addTag(std::string str);
   void removeTag(std::string str);
+
+  void coutTags(){
+    std::cout<<"HERE ARE THE TAGS: ";
+    for(std::vector<std::string>::iterator i=tags.begin();i!=tags.end();++i){
+      std::cout<<*i<<", ";
+    }
+    std::cout<<std::endl;
+  }
 };
 
 #endif
