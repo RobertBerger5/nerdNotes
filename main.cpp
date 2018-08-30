@@ -253,12 +253,7 @@ void drawWindow(){
   //draw everything...
   if(!editing){
     glColor3f(.5,.5,.5);
-    glBegin(GL_LINE_LOOP);
-    glVertex2f(10,10);
-    glVertex2f(10+Note::W,10);
-    glVertex2f(10+Note::W,10+Note::H);
-    glVertex2f(10,10+Note::H);
-    glEnd();
+    drawBox(10,10,Note::W,Note::H,false);
     glColor3f(.01,.01,.01);//somehow this DOES NOT want to be light
     drawText("(new notes will spawn here when created)",10,10,false,Note::W);
     
@@ -272,16 +267,14 @@ void drawWindow(){
       bI->draw();
     }
 
-    
-    //don't even have any non-editing textboxes now...
-    /*for(tI=texts.begin();tI!=texts.end();++tI){
-      if(tI->selected){
-	glColor3f(1,0,0);
-      }else{
-	glColor3f(0,0,0);
-      }
-      tI->draw();
-      }*/
+    int i=0;
+    int x=125;
+    glColor3f(0,0,0);
+    for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){
+      drawBox(x,HEIGHT-60,((*tagI).size())*8+2,15,false);
+      drawText(*tagI,x++,HEIGHT-60,false);
+      x+=((*tagI).size())*8+10;
+    }
     
     //always draw the notes last I think...
     for(nI=notes.begin();nI!=notes.end();++nI){
@@ -312,6 +305,15 @@ void drawWindow(){
   glutSwapBuffers();
 }
 
+void addGlobalTag(string t){
+  //search allTags, if t isn't in there, push_back that rig
+  for(tagI=allTags.begin();tagI!=allTags.end();++tagI){
+    if(t== *tagI)
+      return;
+  }
+  allTags.push_back(t);
+}
+
 void editNote(Note& n){
   editing=true;
   editN=&n;
@@ -324,8 +326,7 @@ void editNote(Note& n){
     editTexts[4].text+= *tagI +", ";
   }
   editTexts[4].text+= *(editN->tags.end()-1);
-  //TODO: should probably just have one of these selected at a time
-  //like a Textbox* selected or somethin
+  //I have editT but I'm too lazy to use it...eh
   for(etI=editTexts.begin();etI!=editTexts.end();++etI){
     etI->selected=false;
   }
@@ -355,12 +356,15 @@ void saveNote(Note& n){
       newTag+=tagString[i];
     }else{
       editN->tags.push_back(newTag);//found comma, so push what we have into a tag
+      addGlobalTag(newTag);
       newTag="";//clear it for the next tag
-      i++;//skip space
+      if(tagString[i+1]==' ')
+	i++;//skip space
     }
   }
   //push whatever's left over in tagString
   editN->tags.push_back(newTag);
+  addGlobalTag(newTag);
   
   
   editing=false;
@@ -378,11 +382,6 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
 }
 
 int main(int argc,char*argv[]){
-  for(int i=0;i<argc;i++){
-    cout<<argv[i]<<endl;
-  }
-  
-  //TODO: complain that they won't be able to save if they don't open a file from the command line...
   if(argc==2){
     fileDir=argv[1];
     openFile(fileDir);
@@ -425,9 +424,12 @@ big ol TODO list:
   save to file
   open from file
   
-  make/edit tags
   make/edit Sources
   
+  delete tags by clicking the right side of them at the bottom (make box have red background)
+  edit tags by clicking left side (make the tag's box have a yellow(?) background
+  
   figure out how to give Notes a source (dropdown kinda thing?)
+  
   search Notes by tag, highlight ones with that tag...
  */

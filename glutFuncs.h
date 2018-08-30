@@ -43,3 +43,16 @@ static void drawText(std::string str,int x,int y,bool big,int w=0){
     glutBitmapCharacter(size,str[i]);
   }
 }
+
+static void drawBox(int x,int y,int w,int h,bool fill){
+  //color beforehand...
+  if(fill)
+    glBegin(GL_POLYGON);
+  else
+    glBegin(GL_LINE_LOOP);
+  glVertex2f(x,y);
+  glVertex2f(x+w,y);
+  glVertex2f(x+w,y+h);
+  glVertex2f(x,y+h);
+  glEnd();
+}
