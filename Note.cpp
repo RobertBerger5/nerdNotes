@@ -27,14 +27,15 @@ Note::Note(Source s){
   src=s;
 }
 
-Note::Note(string t,Source s,string quo,string sum,string imp,vector<string> ta){
+Note::Note(string t,Source s,string quo,string sum,string imp,vector<string> ta,int x1,int y1){
   title=t;//can I do this with strings???
   src=s;//???
   quote=quo;
   summary=sum;
   importance=imp;
   tags=ta;//TODO: IS THIS OKAY WITH VECTORS???
-  x=y=10;//spawn in the top left
+  x=x1;
+  y=y1;//spawn in the top left
 }
 
 Note::Note(const Note& other){

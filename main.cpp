@@ -19,12 +19,11 @@
 using namespace std;
 
 
-int WIDTH=1000;
-int HEIGHT=600;
 char progName[]="nerdNotes";
-string fileDir;//file locations to save and open nerdNotes files
+string fileDir="noname.nn";//file locations to save and open nerdNotes files
 //bool mouseDragging=false;pretty sure this is useless now
 int xStart,yStart,xPtr,yPtr;//where the mouse clicked down last and where it is now
+//xStart=yStart=xPtr=yPtr=0;
 Note* dragN=0;//the note that is being dragged
 int dragX=0;//where mouse was relative to note's upper left corner when clicked
 int dragY=0;
@@ -45,11 +44,9 @@ vector<Note>::iterator nI;
 vector<Note>::reverse_iterator rnI;
 vector<Source>::iterator sI;
 vector<Button>::iterator bI;
-//vector<Textbox>::iterator t;
 
 vector<Button> editButtons={};
 vector<Textbox> editTexts={};
-vector<Button>::iterator ebI;
 vector<Textbox>::iterator etI;
 
 
@@ -174,6 +171,7 @@ void mouse(int button, int state, int x, int y){
       //mouseDragging=true;
       //logic for notes first?
       if(!editing){
+	//check if notes clicked
 	for(rnI=notes.rbegin();rnI!=notes.rend();++rnI){
 	  if(rnI->inside(x,y)){
 	    dragN=&(*rnI);//wow this looks reduntant, yay for iterators
@@ -182,17 +180,41 @@ void mouse(int button, int state, int x, int y){
 	    break;
 	  }
 	}
-	
+
+	//check if buttons clicked
 	for(bI=buttons.begin();bI!=buttons.end();++bI){
 	  if(bI->inside(x,y)){
 	    bI->func(notes[0]);
 	  }
 	}
+	
+	//check if tags area clicked
+	if(pointInside(x,y,TAG_X,TAG_Y,WIDTH-TAG_X,LETTER_H+2)){
+	  //in the right general area
+	  int i=0;
+	  int xT=TAG_X;
+	  int yT=TAG_Y;
+	  int w;
+	  int h=LETTER_H+2;
+	  for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){
+	    w=((*tagI).size())*LETTER_W;
+	    if(pointInside(x,y,xT+w*2/3,yT,w/3,h)){
+	      cout<<"DELETE "<<*tagI<<endl;
+	      break;
+	    }else if(pointInside(x,y,xT,yT,w*2/3,h)){
+	      cout<<"HIGHLIGHT "<<*tagI<<endl;
+	      break;
+	    }else{
+	      xT+=w+TAG_ADD_X;
+	    }
+	  }
+	}
+	
       }else{
 	//tryna click while editing
-	for(ebI=editButtons.begin();ebI!=editButtons.end();++ebI){
-	  if(ebI->inside(x,y)){
-	    ebI->func(notes[0]);
+	for(bI=editButtons.begin();bI!=editButtons.end();++bI){
+	  if(bI->inside(x,y)){
+	    bI->func(notes[0]);
 	  }
 	}
 	
@@ -268,12 +290,23 @@ void drawWindow(){
     }
 
     int i=0;
-    int x=125;
-    glColor3f(0,0,0);
-    for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){
-      drawBox(x,HEIGHT-60,((*tagI).size())*8+2,15,false);
-      drawText(*tagI,x++,HEIGHT-60,false);
-      x+=((*tagI).size())*8+10;
+    int x=TAG_X;
+    int y=TAG_Y;
+    int w;
+    int h=LETTER_H+2;
+    for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){//BIG HOSS
+      w=((*tagI).size())*LETTER_W;
+      if(pointInside(xPtr,yPtr,x+w*2/3,y,w/3,h))
+	glColor3f(1,0,0);
+      else if(pointInside(xPtr,yPtr,x,y,w*2/3,h))
+	glColor3f(1,1,0);
+      else
+	glColor3f(1,1,1);
+      drawBox(x,y,w,h,true);
+      glColor3f(0,0,0);
+      drawBox(x,y,w,h,false);
+      drawText(*tagI,x-1,y-1,false);
+      x+=w+TAG_ADD_X;
     }
     
     //always draw the notes last I think...
@@ -291,14 +324,14 @@ void drawWindow(){
       etI->draw();
     }
     
-    for(ebI=editButtons.begin();ebI!=editButtons.end();++ebI){
-      if(ebI->inside(xPtr,yPtr)){
+    for(bI=editButtons.begin();bI!=editButtons.end();++bI){
+      if(bI->inside(xPtr,yPtr)){
 	glColor3f(.9,.9,.9);
       }else{
 	glColor3f(1,1,1);
       }
       
-      ebI->draw();
+      bI->draw();
     }
   }
   
@@ -312,6 +345,15 @@ void addGlobalTag(string t){
       return;
   }
   allTags.push_back(t);
+}
+
+void deleteTag(string t){//deletes the tag from allTags, then from all Notes
+  //maybe it should highlight all notes you just deleted it from?
+  
+}
+
+void highlightWithTag(string t){
+  //loop through Notes, change background color if they have this tag
 }
 
 void editNote(Note& n){
@@ -378,17 +420,65 @@ void saveFile(Note& n){//kinda annoying that I set it up for all button-able fun
 }
 
 void openFile(string l){//this one ain't gonna be in a button...I think...
-  cout<<"open "<<l<<" and somehow shove its contents into notes and tags..."<<endl;
+  ifstream inStream;
+  inStream.open(fileDir);
+  if(!inStream)//opened a new file/project, let em be
+    return;
+  
+  string sourceNum;
+  string auth;
+  getline(inStream,sourceNum);
+  for(int i=0;i<stoi(sourceNum);i++){
+    getline(inStream,auth);
+    //TODO: when I get more Source things...
+    sources.push_back(Source(auth));
+  }
+  string noteNum;
+  getline(inStream,noteNum);
+  //various strings here...
+  string tit;
+  string src;
+  string quo;
+  string sum;
+  string imp;
+  string tagNum;
+  vector<string> tags;
+  string t;
+  string x;
+  string y;
+  for(int i=0;i<stoi(noteNum);i++){
+    getline(inStream,tit);
+    getline(inStream,src);
+    getline(inStream,quo);
+    getline(inStream,sum);
+    getline(inStream,imp);
+    getline(inStream,tagNum);
+    for(int j=0;j<stoi(tagNum);j++){
+      getline(inStream,t);
+      tags.push_back(t);
+    }
+    getline(inStream,x);
+    getline(inStream,y);
+    notes.push_back(Note(tit,sources[stoi(src)],quo,sum,imp,tags,stoi(x),stoi(y)));
+    tags.clear();
+  }
+  inStream.close();
+
+  cerr<<"gonna get the tags"<<endl;
+  for(nI=notes.begin();nI!=notes.end();++nI){
+    /*cerr<<"in "<<nI->title<<endl;//TODO: why on earth does this not work???
+    for(tagI=nI->tags.begin(); tagI!=nI->tags.end(); ++tagI){
+      cerr<<"adding "<<(*tagI)<<endl;
+      addGlobalTag(*tagI);
+      cerr<<"added"<<endl;
+      }*/
+    editNote(*nI);//VERY stupid workaround bc it works when I click on the note to edit, then save
+    saveNote(*nI);//wow this is bad...
+  }
+  
 }
 
 int main(int argc,char*argv[]){
-  if(argc==2){
-    fileDir=argv[1];
-    openFile(fileDir);
-  }else{
-    cout<<"ERROR: Please enter exactly one file in the command line"<<endl;
-    cout<<"Enter it directly after \"./nerdNotes,\" thank you."<<endl;
-  }
   
   sources.push_back(Source("(please select a note...)"));//default source (kinda)
   //should probably just have a check if notes.size()>0, if not then just complain
@@ -414,6 +504,13 @@ int main(int argc,char*argv[]){
   
   editButtons.push_back(Button("Save Note",10,HEIGHT-60,100,50,saveNote));
   
+  if(argc==2){
+    fileDir=argv[1];
+    openFile(fileDir);
+  }else{
+    cout<<"ERROR: Please enter exactly one file in the command line"<<endl;
+    cout<<"Enter it directly after \"./nerdNotes,\" thank you."<<endl;
+  }
   
   init_gl_window();
 }
@@ -426,10 +523,9 @@ big ol TODO list:
   
   make/edit Sources
   
-  delete tags by clicking the right side of them at the bottom (make box have red background)
-  edit tags by clicking left side (make the tag's box have a yellow(?) background
+  highlight Notes by tag
   
-  figure out how to give Notes a source (dropdown kinda thing?)
+  remove global tags (and remove the tag from all Notes that had it (maybe highlight em red afterwards?)
   
-  search Notes by tag, highlight ones with that tag...
+  figure out how to give Notes a Source (dropdown kinda thing?)
  */

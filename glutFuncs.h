@@ -7,7 +7,18 @@
 #include <iostream>
 #include <string.h>
 
-static void drawText(std::string str,int x,int y,bool big,int w=0){
+
+static int WIDTH=1000;
+static int HEIGHT=600;
+
+static const int TAG_X=150;
+static const int TAG_Y=HEIGHT-60;
+static const int TAG_ADD_X=10;
+static const int LETTER_W=8;
+static const int LETTER_H=13;
+
+
+inline void drawText(std::string str,int x,int y,bool big,int w=0){
   void** size;
   int maxchars=999999;//max amount of chars that can fit before overflowing
   int letterH;
@@ -44,7 +55,7 @@ static void drawText(std::string str,int x,int y,bool big,int w=0){
   }
 }
 
-static void drawBox(int x,int y,int w,int h,bool fill){
+inline void drawBox(int x,int y,int w,int h,bool fill){
   //color beforehand...
   if(fill)
     glBegin(GL_POLYGON);
@@ -55,4 +66,13 @@ static void drawBox(int x,int y,int w,int h,bool fill){
   glVertex2f(x+w,y+h);
   glVertex2f(x,y+h);
   glEnd();
+}
+
+inline bool pointInside(int xPt,int yPt,int x,int y,int w,int h){
+  return(
+	 xPt>x &&
+	 yPt>y &&
+	 xPt<x+w &&
+	 yPt<y+h
+	 );
 }

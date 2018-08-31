@@ -21,7 +21,7 @@ class Note{
 
   Note();
   Note(Source s);
-  Note(std::string t,Source s,std::string quo,std::string sum,std::string imp,std::vector<std::string> tags);
+  Note(std::string t,Source s,std::string quo,std::string sum,std::string imp,std::vector<std::string> tags,int x1,int y1);
   Note(const Note& other);
 
   bool inside(int x1,int y1);
