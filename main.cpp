@@ -58,6 +58,8 @@ void mouse(int button,int state,int x,int y);
 void mouseMotion(int x,int y);
 void mouseMotionPassive(int x,int y);
 
+void deleteTag(string t);
+void highlightTag(string t);
 void editNote(Note& n);
 void saveFile(Note& n);
 
@@ -199,10 +201,10 @@ void mouse(int button, int state, int x, int y){
 	  for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){
 	    w=((*tagI).size())*LETTER_W;
 	    if(pointInside(x,y,xT+w*2/3,yT,w/3,h)){
-	      cout<<"DELETE "<<*tagI<<endl;
+	      deleteTag(*tagI);
 	      break;
 	    }else if(pointInside(x,y,xT,yT,w*2/3,h)){
-	      cout<<"HIGHLIGHT "<<*tagI<<endl;
+	      highlightTag(*tagI);
 	      break;
 	    }else{
 	      xT+=w+TAG_ADD_X;
@@ -349,11 +351,12 @@ void addGlobalTag(string t){
 
 void deleteTag(string t){//deletes the tag from allTags, then from all Notes
   //maybe it should highlight all notes you just deleted it from?
-  
+  cout<<"gotta delete "<<t<<endl;
 }
 
-void highlightWithTag(string t){
+void highlightTag(string t){
   //loop through Notes, change background color if they have this tag
+  cout<<"gotta highlight "<<t<<endl;
 }
 
 void editNote(Note& n){
@@ -372,7 +375,6 @@ void editNote(Note& n){
   for(etI=editTexts.begin();etI!=editTexts.end();++etI){
     etI->selected=false;
   }
-  cout<<"editing "<<n.title<<"..."<<endl;
 }
 
 void newNote(Note& n){
@@ -416,7 +418,31 @@ void saveNote(Note& n){
 }
 
 void saveFile(Note& n){//kinda annoying that I set it up for all button-able funcs to have this arg
-  cout<<"I should really find out how to save this to a file"<<endl;
+  ofstream outStream;
+  outStream.open(fileDir);
+  //if(!outStream)
+    //TODO:somehow push somethin here
+  outStream<<sources.size()<<endl;
+  for(sI=sources.begin();sI!=sources.end();sI++){
+    outStream<<sI->author<<endl;
+  }
+  outStream<<notes.size()<<endl;
+  for(nI=notes.begin();nI!=notes.end();++nI){
+    outStream<<nI->title<<endl;
+    outStream<<0<<endl;//TODO: SOURCE NUMBER!
+    outStream<<nI->quote<<endl;
+    outStream<<nI->summary<<endl;
+    outStream<<nI->importance<<endl;
+    outStream<<nI->tags.size()<<endl;
+    for(tagI=nI->tags.begin();tagI!=nI->tags.end();++tagI)
+      outStream<<*tagI<<endl;
+    outStream<<nI->x<<endl;
+    outStream<<nI->y<<endl;
+  }
+
+  outStream.close();
+
+  cout<<"file saved to "<<fileDir<<endl;
 }
 
 void openFile(string l){//this one ain't gonna be in a button...I think...
@@ -433,6 +459,7 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
     //TODO: when I get more Source things...
     sources.push_back(Source(auth));
   }
+  
   string noteNum;
   getline(inStream,noteNum);
   //various strings here...
@@ -480,7 +507,7 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
 
 int main(int argc,char*argv[]){
   
-  sources.push_back(Source("(please select a note...)"));//default source (kinda)
+  //sources.push_back(Source("(please select a note...)"));//default source (kinda)
   //should probably just have a check if notes.size()>0, if not then just complain
   
   buttons.push_back(Button("New Note",10,HEIGHT-60,100,50,newNote));
@@ -508,7 +535,7 @@ int main(int argc,char*argv[]){
     fileDir=argv[1];
     openFile(fileDir);
   }else{
-    cout<<"ERROR: Please enter exactly one file in the command line"<<endl;
+    cout<<"ERROR: Please enter exactly one file in the command line\n";
     cout<<"Enter it directly after \"./nerdNotes,\" thank you."<<endl;
   }
   
@@ -518,14 +545,15 @@ int main(int argc,char*argv[]){
 /*
 big ol TODO list:
   
-  save to file
-  open from file
-  
   make/edit Sources
+  give Notes a Source (with a dropdown?)
+
+  maybe list the already existing tags when editing so they can see what they've got...
   
   highlight Notes by tag
   
   remove global tags (and remove the tag from all Notes that had it (maybe highlight em red afterwards?)
   
-  figure out how to give Notes a Source (dropdown kinda thing?)
+  have a "Delete Note" editButton
+  
  */
