@@ -1,7 +1,7 @@
-#ifndef _NOTE_
-#define _NOTE_
+#ifndef _TAG_
+#define _TAG_
 
-#include <string.h>
+#include <string>
 #include <vector>
 #include <map>
 
@@ -10,18 +10,11 @@
 class Tag{
  public:
   std::string name;
-  map<string,Note> notes;
+  std::map<std::string,Note> notes;//TODO: make em pointers, so when the tag is deleted, we can call deleteTag on that note and it'll be super easy and nice
 
-  Tag(){
-    //dunno what to do here...
-  }
-  Tag(std::string n){
-    name=n;
-  }
-  Tag(const Tag& other){
-    name=other.name;
-    notes=other.notes;
-  }
+  Tag();
+  Tag(std::string n);
+  Tag(const Tag& other);
 };
 
 #endif

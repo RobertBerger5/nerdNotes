@@ -8,13 +8,14 @@
 #include <string.h>
 #include <fstream>
 #include <iterator>
+#include <vector>
+#include <map>
 
 #include "glutFuncs.h"
 #include "Note.h"
 #include "Source.h"
 #include "Button.h"
 #include "Textbox.h"
-#include "Tag.h"
 
 using namespace std;
 
@@ -35,11 +36,11 @@ vector<Note> notes;
 vector<Source> sources;
 vector<Button> buttons;
 vector<Textbox> texts;
-vector<string> allTags;
+//vector<string> allTags;
 
 map<string,Tag> tags;
 
-vector<string>::iterator tagI;
+map<string,Tag>::iterator tagI;
 
 vector<Note>::iterator nI;
 vector<Note>::reverse_iterator rnI;
@@ -199,13 +200,13 @@ void mouse(int button, int state, int x, int y){
 	  int yT=TAG_Y;
 	  int w;
 	  int h=LETTER_H+2;
-	  for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){
-	    w=((*tagI).size())*LETTER_W;
+	  for(tagI=tags.begin();tagI!=tags.end();++tagI,i++){
+	    w=((*tagI).second.name.size())*LETTER_W;
 	    if(pointInside(x,y,xT+w*2/3,yT,w/3,h)){
-	      deleteTag(*tagI);
+	      deleteTag(tagI->second.name);
 	      break;
 	    }else if(pointInside(x,y,xT,yT,w*2/3,h)){
-	      highlightTag(*tagI);
+	      highlightTag(tagI->second.name);
 	      break;
 	    }else{
 	      xT+=w+TAG_ADD_X;
@@ -297,8 +298,8 @@ void drawWindow(){
     int y=TAG_Y;
     int w;
     int h=LETTER_H+2;
-    for(tagI=allTags.begin();tagI!=allTags.end();++tagI,i++){//BIG HOSS
-      w=((*tagI).size())*LETTER_W;
+    for(tagI=tags.begin();tagI!=tags.end();++tagI,i++){//BIG HOSS
+      w=((tagI->second.name).size())*LETTER_W;
       if(pointInside(xPtr,yPtr,x+w*2/3,y,w/3,h))
 	glColor3f(1,0,0);
       else if(pointInside(xPtr,yPtr,x,y,w*2/3,h))
@@ -308,7 +309,7 @@ void drawWindow(){
       drawBox(x,y,w,h,true);
       glColor3f(0,0,0);
       drawBox(x,y,w,h,false);
-      drawText(*tagI,x-1,y-1,false);
+      drawText(tagI->second.name,x-1,y-1,false);
       x+=w+TAG_ADD_X;
     }
     
@@ -342,12 +343,14 @@ void drawWindow(){
 }
 
 bool addTag(string s){//returns false if tag already exists
-  if(tags.contains(s)){
+  if(tags.count(s)>0){
     cout<<"already exists"<<endl;
+    return false;
   }else{
-    Tag tag=new Tag(s);
-    tags.insert(s,tag);
-    cout<<"inserted "<<t<<endl;
+    Tag tag=*(new Tag(s));
+    tags.insert(pair<string,Tag>(s,tag));
+    cout<<"inserted "<<s<<endl;
+    return true;
   }
 }
 
@@ -377,11 +380,10 @@ void editNote(Note& n){//TODO: REMOVE GLOBAL TAGS IF THEY ONLY EXISTED FOR THAT 
   editTexts[1].text=editN->quote;
   editTexts[2].text=editN->summary;
   editTexts[3].text=editN->importance;
-  //TODO: GET TAGS IN THERE
-  for(tagI=editN->tags.begin(); tagI!=(editN->tags.end()-1); ++tagI){
-    editTexts[4].text+= *tagI +", ";
+  for(tagI=editN->tags.begin(); tagI!=prev(editN->tags.end()); ++tagI){
+    editTexts[4].text+= tagI->second.name +", ";
   }
-  editTexts[4].text+= *(editN->tags.end()-1);
+  editTexts[4].text+= (prev(editN->tags.end()))->second.name;
   //I have editT but I'm too lazy to use it...eh
   for(etI=editTexts.begin();etI!=editTexts.end();++etI){
     etI->selected=false;
@@ -420,7 +422,8 @@ void saveNote(Note& n){
     if(tagString[i]!=','){//not a comma, so add it to the current tag
       newTag+=tagString[i];
     }else{
-      editN->tags.push_back(newTag);//found comma, so push what we have into a tag
+      //editN->tags.push_back(newTag);//found comma, so push what we have into a tag
+      editN->addTag(newTag);
       addTag(newTag);
       //addGlobalTag(newTag);
       newTag="";//clear it for the next tag
@@ -429,8 +432,10 @@ void saveNote(Note& n){
     }
   }
   //push whatever's left over in tagString
-  editN->tags.push_back(newTag);
-  addGlobalTag(newTag);
+  //editN->tags.push_back(newTag);
+  editN->addTag(newTag);
+  addTag(newTag);
+  //addGlobalTag(newTag);
   
   
   editing=false;
@@ -457,7 +462,7 @@ void saveFile(Note& n){//kinda annoying that I set it up for all button-able fun
     outStream<<nI->importance<<endl;
     outStream<<nI->tags.size()<<endl;
     for(tagI=nI->tags.begin();tagI!=nI->tags.end();++tagI)
-      outStream<<*tagI<<endl;
+      outStream<<tagI->second.name<<endl;
     outStream<<nI->x<<endl;
     outStream<<nI->y<<endl;
   }
@@ -491,7 +496,7 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
   string sum;
   string imp;
   string tagNum;
-  vector<string> tags;
+  map<string,Tag> tags;
   string t;
   string x;
   string y;
@@ -504,7 +509,8 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
     getline(inStream,tagNum);
     for(int j=0;j<stoi(tagNum);j++){
       getline(inStream,t);
-      tags.push_back(t);
+      //tags.push_back(t);
+      addTag(t);
     }
     getline(inStream,x);
     getline(inStream,y);

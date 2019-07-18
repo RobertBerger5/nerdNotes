@@ -4,11 +4,8 @@
 #include<GL/glut.h>
 #endif
 
-#include <iostream>
-
 #include "glutFuncs.h"
 #include "Note.h"
-#include "Source.h"
 
 using namespace std;
 
@@ -22,18 +19,17 @@ Note::Note(){
 
 Note::Note(Source s){
   title=quote=summary=importance="";
-  tags={""};
   x=y=10;
   src=s;
 }
 
-Note::Note(string t,Source s,string quo,string sum,string imp,vector<string> ta,int x1,int y1){
+Note::Note(string t,Source s,string quo,string sum,string imp,map<string,Tag> ta,int x1,int y1){
   title=t;//can I do this with strings???
   src=s;//???
   quote=quo;
   summary=sum;
   importance=imp;
-  tags=ta;//TODO: IS THIS OKAY WITH VECTORS???
+  tags=ta;//TODO: IS THIS OKAY WITH mappy boi???
   x=x1;
   y=y1;//spawn in the top left
 }
@@ -62,9 +58,9 @@ void Note::printNote(){
   cout<<title<<endl;
   src.printSource();
   cout<<endl<<"Quote: "<<quote<<endl<<"Summary: "<<summary<<endl<<"Importance: "<<importance<<endl<<"Tags:"<<endl;
-  for(string s : tags){
+  /*for(string s : tags){
     cout<<"\t"<<s<<endl;
-  }
+    }*/
 }
 
 void Note::draw(){
@@ -88,20 +84,27 @@ void Note::draw(){
   glutPostRedisplay();
 }
 
-void Note::addTag(string str){
+void Note::addTag(string s){
+  if(tags.count(s)>0){
+    cout<<"already exists"<<endl;
+  }else{
+    Tag tag=*(new Tag(s));
+    tags.insert(pair<string,Tag>(s,tag));
+  }
   //check if it's already a thing, if not then add it to the vector
-  for(string s : tags){
+  /*for(string s : tags){
     if(!str.compare(s)){//string.compare() returns 0 if they're equal
       cout<<title<<" already has tag \""<<str<<"\""<<endl;
       return;
     }
   }
-  tags.push_back(str);
-  cout<<"Added tag \""<<str<<"\" to "<<title<<endl;
+  tags.push_back(str);*/
+  cout<<"Added tag \""<<s<<"\" to "<<title<<endl;
 }
 
 void Note::removeTag(string str){
-  int i=0;//I feel like this is a weird way of doing it, but oh well...
+  tags.erase(str);
+  /*int i=0;//I feel like this is a weird way of doing it, but oh well...
   for(string s : tags){
     if(!str.compare(s)){
       tags.erase(tags.begin()+i);
@@ -110,5 +113,17 @@ void Note::removeTag(string str){
     }
     i++;
   }
-  cout<<title<<" didn't have tag "<<str<<endl;
+  cout<<title<<" didn't have tag "<<str<<endl;*/
+}
+
+
+Tag::Tag(){
+  //dunno
+}
+Tag::Tag(std::string n){
+  name=n;
+}
+Tag::Tag(const Tag& other){
+  name=other.name;
+  notes=other.notes;
 }

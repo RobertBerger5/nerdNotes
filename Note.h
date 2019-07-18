@@ -1,11 +1,13 @@
 #ifndef _NOTE_
 #define _NOTE_
 
-#include <string.h>
+#include <string>
 #include <vector>
+#include <iostream>
+#include <map>
 
 #include "Source.h"
-
+class Tag;
 
 class Note{
  public:
@@ -16,12 +18,12 @@ class Note{
   std::string quote;
   std::string summary;
   std::string importance;
-  std::vector<std::string> tags;
+  std::map<std::string,Tag> tags;
   int x,y;
 
   Note();
   Note(Source s);
-  Note(std::string t,Source s,std::string quo,std::string sum,std::string imp,std::vector<std::string> tags,int x1,int y1);
+  Note(std::string t,Source s,std::string quo,std::string sum,std::string imp,std::map<std::string,Tag> tags,int x1,int y1);
   Note(const Note& other);
 
   bool inside(int x1,int y1);
@@ -33,11 +35,23 @@ class Note{
 
   void coutTags(){
     std::cout<<"HERE ARE THE TAGS: ";
-    for(std::vector<std::string>::iterator i=tags.begin();i!=tags.end();++i){
+    /*for(std::vector<std::string>::iterator i=tags.begin();i!=tags.end();++i){
       std::cout<<*i<<", ";
-    }
-    std::cout<<std::endl;
+      }*/
+    std::cout<<"jk"<<std::endl;
   }
 };
+
+
+class Tag{
+ public:
+  std::string name;
+  std::map<std::string,Note> notes;//TODO: make em pointers, so when the tag is deleted, we can call deleteTag on that note and it'll be super easy and nice
+
+  Tag();
+  Tag(std::string n);
+  Tag(const Tag& other);
+};
+
 
 #endif
