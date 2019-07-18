@@ -7,7 +7,6 @@ else
  LIBS = -I/usr/common/include -I/usr/include/GL -L/System/Library/Frameworks/OpenGL.framework/Libraries -framework GLUT -framework OpenGL -framework Cocoa #-lGL -lm -lobjc -lstdc++ -lGLU lGL #-lglut
 endif
 
-
 nerdNotes:	Note.o Source.o Button.o Textbox.o main.o
 	g++ $(OPTS) -o nerdNotes Note.o Source.o Button.o Textbox.o main.o $(LIBS)
 

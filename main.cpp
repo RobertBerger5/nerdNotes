@@ -14,10 +14,9 @@
 #include "Source.h"
 #include "Button.h"
 #include "Textbox.h"
-
+#include "Tag.h"
 
 using namespace std;
-
 
 char progName[]="nerdNotes";
 string fileDir="noname.nn";//file locations to save and open nerdNotes files
@@ -32,11 +31,13 @@ Note* editN=0;
 
 Textbox* editT=0;
 
-vector<Note> notes={};
-vector<Source> sources={};
-vector<Button> buttons={};
-vector<Textbox> texts={};
-vector<string> allTags={};
+vector<Note> notes;
+vector<Source> sources;
+vector<Button> buttons;
+vector<Textbox> texts;
+vector<string> allTags;
+
+map<string,Tag> tags;
 
 vector<string>::iterator tagI;
 
@@ -45,8 +46,8 @@ vector<Note>::reverse_iterator rnI;
 vector<Source>::iterator sI;
 vector<Button>::iterator bI;
 
-vector<Button> editButtons={};
-vector<Textbox> editTexts={};
+vector<Button> editButtons;
+vector<Textbox> editTexts;
 vector<Textbox>::iterator etI;
 
 
@@ -340,14 +341,24 @@ void drawWindow(){
   glutSwapBuffers();
 }
 
-void addGlobalTag(string t){
+bool addTag(string s){//returns false if tag already exists
+  if(tags.contains(s)){
+    cout<<"already exists"<<endl;
+  }else{
+    Tag tag=new Tag(s);
+    tags.insert(s,tag);
+    cout<<"inserted "<<t<<endl;
+  }
+}
+
+     /*void addGlobalTag(string t){
   //search allTags, if t isn't in there, push_back that rig
   for(tagI=allTags.begin();tagI!=allTags.end();++tagI){
     if(t== *tagI)
       return;
   }
   allTags.push_back(t);
-}
+}*/
 
 void deleteTag(string t){//deletes the tag from allTags, then from all Notes
   //maybe it should highlight all notes you just deleted it from?
@@ -359,7 +370,7 @@ void highlightTag(string t){
   cout<<"gotta highlight "<<t<<endl;
 }
 
-void editNote(Note& n){
+void editNote(Note& n){//TODO: REMOVE GLOBAL TAGS IF THEY ONLY EXISTED FOR THAT NOTE
   editing=true;
   editN=&n;
   editTexts[0].text=editN->title;
@@ -377,7 +388,17 @@ void editNote(Note& n){
   }
 }
 
-void newNote(Note& n){
+void deleteNote(Note& n){
+  for(nI=notes.begin();nI!=notes.end();++nI){
+    if(&(*nI)==&n){
+      notes.erase(nI);
+      editing=false;
+      editN=0;
+    }
+  }
+}
+
+void newNote(Note& n){//TODO: THIS FUCKS ITSELF WITH A NEW FILE, PROBABLY CUZ sources[0] AINT A THING!
   //terrible practice, but imma just not do
   //anything with Note n, lmao rip
   notes.push_back(Note(sources[0]));//push an empty rig
@@ -400,7 +421,8 @@ void saveNote(Note& n){
       newTag+=tagString[i];
     }else{
       editN->tags.push_back(newTag);//found comma, so push what we have into a tag
-      addGlobalTag(newTag);
+      addTag(newTag);
+      //addGlobalTag(newTag);
       newTag="";//clear it for the next tag
       if(tagString[i+1]==' ')
 	i++;//skip space
@@ -530,6 +552,7 @@ int main(int argc,char*argv[]){
   
   
   editButtons.push_back(Button("Save Note",10,HEIGHT-60,100,50,saveNote));
+  editButtons.push_back(Button("Delete Note",10,HEIGHT-120,100,50,deleteNote));
   
   if(argc==2){
     fileDir=argv[1];
