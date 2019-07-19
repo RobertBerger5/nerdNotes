@@ -496,7 +496,7 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
   string sum;
   string imp;
   string tagNum;
-  map<string,Tag> tags;
+  map<string,Tag> newTags;
   string t;
   string x;
   string y;
@@ -509,27 +509,28 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
     getline(inStream,tagNum);
     for(int j=0;j<stoi(tagNum);j++){
       getline(inStream,t);
-      //tags.push_back(t);
+      Tag ta=*(new Tag(t));
+      newTags.insert(pair<string,Tag>(t,ta));
       addTag(t);
     }
     getline(inStream,x);
     getline(inStream,y);
-    notes.push_back(Note(tit,sources[stoi(src)],quo,sum,imp,tags,stoi(x),stoi(y)));
-    tags.clear();
+    notes.push_back(Note(tit,sources[stoi(src)],quo,sum,imp,newTags,stoi(x),stoi(y)));
+    newTags.clear();
   }
   inStream.close();
 
-  cerr<<"gonna get the tags"<<endl;
+  /*cerr<<"gonna get the tags"<<endl;
   for(nI=notes.begin();nI!=notes.end();++nI){
     /*cerr<<"in "<<nI->title<<endl;//TODO: why on earth does this not work???
     for(tagI=nI->tags.begin(); tagI!=nI->tags.end(); ++tagI){
       cerr<<"adding "<<(*tagI)<<endl;
       addGlobalTag(*tagI);
       cerr<<"added"<<endl;
-      }*/
+      }*
     editNote(*nI);//VERY stupid workaround bc it works when I click on the note to edit, then save
     saveNote(*nI);//wow this is bad...
-  }
+  }*/
   
 }
 
