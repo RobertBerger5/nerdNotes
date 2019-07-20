@@ -29,7 +29,7 @@ Note::Note(string t,Source s,string quo,string sum,string imp,map<string,Tag> ta
   quote=quo;
   summary=sum;
   importance=imp;
-  tags=ta;//TODO: IS THIS OKAY WITH mappy boi???
+  tags=ta;
   x=x1;
   y=y1;//spawn in the top left
 }
@@ -63,8 +63,17 @@ void Note::printNote(){
     }*/
 }
 
+void Note::highlight(float red,float green,float blue){
+  r=red;
+  g=green;
+  b=blue;
+}
+
 void Note::draw(){
-  glColor3f(1,1,1);//white background
+  if(highlighted)
+    glColor3f(r,g,b);
+  else
+    glColor3f(1,1,1);
   glBegin(GL_POLYGON);
   glVertex2f(x,y);
   glVertex2f(x+W,y);
@@ -126,4 +135,10 @@ Tag::Tag(std::string n){
 Tag::Tag(const Tag& other){
   name=other.name;
   notes=other.notes;
+}
+
+void Tag::highlightNotes(){
+  for(map<string,Note&>::iterator it=notes.begin();it!=notes.end();++it){
+    it->second.highlight(1,1,0);
+  }
 }

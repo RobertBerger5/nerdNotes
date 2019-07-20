@@ -20,6 +20,8 @@ class Note{
   std::string importance;
   std::map<std::string,Tag> tags;
   int x,y;
+  bool highlighted=false;
+  float r,g,b=1;
 
   Note();
   Note(Source s);
@@ -28,6 +30,7 @@ class Note{
 
   bool inside(int x1,int y1);
   void printNote();
+  void highlight(float red,float green,float blue);
   void draw();
 
   void addTag(std::string str);
@@ -46,11 +49,13 @@ class Note{
 class Tag{
  public:
   std::string name;
-  std::map<std::string,Note> notes;//TODO: make em pointers, so when the tag is deleted, we can call deleteTag on that note and it'll be super easy and nice
+  std::map<std::string,Note&> notes;//TODO: make em pointers, so when the tag is deleted, we can call deleteTag on that note and it'll be super easy and nice
 
   Tag();
   Tag(std::string n);
   Tag(const Tag& other);
+  
+  void highlightNotes();
 };
 
 

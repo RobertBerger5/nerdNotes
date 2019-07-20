@@ -275,6 +275,7 @@ void mouseMotionPassive(int x,int y){
 }
 
 void drawWindow(){
+  //cerr<<"drawing..."<<endl;
   glClear(GL_COLOR_BUFFER_BIT);
   //draw everything...
   if(!editing){
@@ -340,6 +341,7 @@ void drawWindow(){
   }
   
   glutSwapBuffers();
+  //cerr<<"drew"<<endl;
 }
 
 bool addTag(string s){//returns false if tag already exists
@@ -353,15 +355,6 @@ bool addTag(string s){//returns false if tag already exists
     return true;
   }
 }
-
-     /*void addGlobalTag(string t){
-  //search allTags, if t isn't in there, push_back that rig
-  for(tagI=allTags.begin();tagI!=allTags.end();++tagI){
-    if(t== *tagI)
-      return;
-  }
-  allTags.push_back(t);
-}*/
 
 void deleteTag(string t){//deletes the tag from allTags, then from all Notes
   //maybe it should highlight all notes you just deleted it from?
@@ -390,6 +383,7 @@ void editNote(Note& n){//TODO: REMOVE GLOBAL TAGS IF THEY ONLY EXISTED FOR THAT 
   }
 }
 
+//TODO: doesn't always get the right one somehow...
 void deleteNote(Note& n){
   for(nI=notes.begin();nI!=notes.end();++nI){
     if(&(*nI)==&n){
@@ -501,37 +495,29 @@ void openFile(string l){//this one ain't gonna be in a button...I think...
   string x;
   string y;
   for(int i=0;i<stoi(noteNum);i++){
+    //cerr<<"reading in things"<<endl;
     getline(inStream,tit);
     getline(inStream,src);
     getline(inStream,quo);
     getline(inStream,sum);
     getline(inStream,imp);
     getline(inStream,tagNum);
+    //cerr<<"reading in tags"<<endl;
     for(int j=0;j<stoi(tagNum);j++){
       getline(inStream,t);
       Tag ta=*(new Tag(t));
       newTags.insert(pair<string,Tag>(t,ta));
       addTag(t);
     }
+    //cerr<<"finished tags"<<endl;
     getline(inStream,x);
     getline(inStream,y);
     notes.push_back(Note(tit,sources[stoi(src)],quo,sum,imp,newTags,stoi(x),stoi(y)));
     newTags.clear();
+    //cerr<<"finished reading in this note"<<endl;
   }
   inStream.close();
-
-  /*cerr<<"gonna get the tags"<<endl;
-  for(nI=notes.begin();nI!=notes.end();++nI){
-    /*cerr<<"in "<<nI->title<<endl;//TODO: why on earth does this not work???
-    for(tagI=nI->tags.begin(); tagI!=nI->tags.end(); ++tagI){
-      cerr<<"adding "<<(*tagI)<<endl;
-      addGlobalTag(*tagI);
-      cerr<<"added"<<endl;
-      }*
-    editNote(*nI);//VERY stupid workaround bc it works when I click on the note to edit, then save
-    saveNote(*nI);//wow this is bad...
-  }*/
-  
+  //cerr<<"successfully (i hope) read in the file"<<endl;
 }
 
 int main(int argc,char*argv[]){
@@ -582,8 +568,10 @@ big ol TODO list:
   
   highlight Notes by tag
   
-  remove global tags (and remove the tag from all Notes that had it (maybe highlight em red afterwards?)
+  fix tag deleting...what has to be a reference for this to work?
   
-  have a "Delete Note" editButton
+  "Delete Note" editButton doesn't always delete the right note...
+
+  onRollOver and onRollOff functions so everything isn't constantly called all the time?
   
  */
